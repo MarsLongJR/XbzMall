@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.XbzMemberLoginLogDao">
+    <resultMap id="memberLoginLogMap" type="com.macro.mall.dto.member.XbzMemberLoginLogResult"
+               extends="com.macro.mall.mapper.XbzMemberMapper.BaseResultMap">
+        <collection property="memberLoginLogMapper" resultMap="com.macro.mall.mapper.XbzMemberLoginLogMapper.BaseResultMap"
+                    columnPrefix="log_"></collection>
+    </resultMap>
+    <select id="getPhoneDetail" resultMap="memberLoginLogMapper">
+        select
+            c2.*,
+        from  xbz_member_login_log c2 left join xbz_member c1 on c1.member_id = c2.id
+        where c1.phone={#phone}
+</select>
+</mapper>

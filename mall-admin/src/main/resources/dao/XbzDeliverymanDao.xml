@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.deliverymanDao.XbzDeliverymanDao">
+    <resultMap id="deliveryManDetailResultMap" type="com.macro.mall.dto.deliveryman.XbzDeliveryManDetail"
+               extends="com.macro.mall.mapper.XbzDeliverymanMapper.BaseResultMap">
+    </resultMap>
+
+    <select id="detail" resultMap="deliveryManDetailResultMap">
+        SELECT d.*,
+            o.*,
+            m.*,
+        FROM
+            xbz_deliveryman d
+            LEFT JOIN xbz_order o ON o.id = d.order_id
+            LEFT JOIN xbz_machine m ON m.id = d.machine_id
+        WHERE
+            d.id = #{id}
+        ORDER BY d.id ASC,d.create_time DESC
+    </select>
+</mapper>

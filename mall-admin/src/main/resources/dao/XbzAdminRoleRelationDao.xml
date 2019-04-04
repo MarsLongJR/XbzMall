@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.admin.XbzAdminRoleRelationDao">
+    <!--批量新增回写主键支持-->
+    <insert id="insertList">
+        INSERT INTO xbz_admin_role_relation (admin_id, role_id) VALUES
+        <foreach collection="list" separator="," item="item" index="index">
+            (#{item.adminId,jdbcType=BIGINT},
+            #{item.roleId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+    <select id="getRoleList" resultMap="com.macro.mall.mapper.XbzRoleMapper.BaseResultMap">
+        select r.*
+        from xbz_admin_role_relation ar left join xbz_role r on ar.role_id = r.id
+        where ar.admin_id = #{adminId}
+    </select>
+    <select id="getRolePermissionList" resultMap="com.macro.mall.mapper.XbzPermissionMapper.BaseResultMap">
+        select p.*
+        from xbz_admin_role_relation ar left join xbz_role r on ar.role_id = r.id
+            left join xbz_role_permission_relation rp on r.id = rp.role_id
+            left join xbz_permission p on rp.permission_id=p.id
+            where ar.admin_id = #{adminId} and p.id is not null
+    </select>
+    <select id="getPermissionList" resultMap="com.macro.mall.mapper.XbzPermissionMapper.BaseResultMap">
+        SELECT
+            p.*
+        FROM
+            xbz_admin_role_relation ar
+            LEFT JOIN xbz_role r ON ar.role_id = r.id
+            LEFT JOIN xbz_role_permission_relation rp ON r.id = rp.role_id
+            LEFT JOIN xbz_permission p ON rp.permission_id = p.id
+        WHERE
+            ar.admin_id = #{adminId}
+            AND p.id IS NOT NULL
+            AND p.id NOT IN (
+                SELECT
+                    p.id
+                FROM
+                    xbz_admin_permission_relation pr
+                    LEFT JOIN xbz_permission p ON pr.permission_id = p.id
+                WHERE
+                    pr.type = - 1
+                    AND pr.admin_id = #{adminId}
+            )
+        UNION
+        SELECT
+            p.*
+        FROM
+            xbz_admin_permission_relation pr
+            LEFT JOIN xbz_permission p ON pr.permission_id = p.id
+        WHERE
+            pr.type = 1
+            AND pr.admin_id = #{adminId}
+    </select>
+</mapper>

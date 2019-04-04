@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.Member.XbzMemberDao">
+    <resultMap id="memberDetailResultMap" type="com.macro.mall.dto.member.XbzMemberDetail"
+               extends="com.macro.mall.mapper.XbzMemberMapper.BaseResultMap">
+        <collection property="memberLevel" resultMap="com.macro.mall.mapper.XbzMemberLevelMapper.BaseResultMap" columnPrefix="level_"/>
+        <collection property="memberReceiveAddress" resultMap="com.macro.mall.mapper.XbzMemberReceiveAddressMapper.BaseResultMap" columnPrefix="address_"/>
+        <collection property="memberLoginLog" resultMap="com.macro.mall.mapper.XbzMemberLoginLogMapper.BaseResultMap" columnPrefix="log_"/>
+        <collection property="memberStatisticsInfo" resultMap="com.macro.mall.mapper.XbzMemberStatisticsInfoMapper.BaseResultMap" columnPrefix="info_"/>
+    </resultMap>
+    <select id="getList" resultMap="com.macro.mall.mapper.XbzMemberMapper.BaseResultMap">
+        SELECT *
+        FROM
+        xbz_member
+        WHERE
+        status = 1
+        <if test="queryParam.username!=null and queryParam.username!=''">
+            AND username = #{queryParam.username}
+        </if>
+        <if test="queryParam.status!=null">
+            AND `status` = #{queryParam.status}
+        </if>
+        <if test="queryParam.phone=null and queryParam.phone!=''">
+            AND phone = #{queryParam.phone}
+        </if>
+        <if test="queryParam.source_type">
+            AND source_type = #{queryParam.source_type}
+        </if>
+        <if test="queryParam.createTime!=null and queryParam.createTime!=''">
+            AND create_time LIKE concat(#{queryParam.createTime},"%")
+        </if>
+    </select>
+    <select id="getDetail" resultMap="memberDetailResultMap">
+        SELECT m.*,
+            ml.id level_id,
+            ml.name level_name,
+            ml.growth_point,
+            ml.default_status,
+            ml.free_freight_point,
+            ml.comment_growth_point,
+            ml.note,
+            mra.name,
+            mra.phone_number,
+            mra.default_status,
+            mra.post_code,
+            mra.province,
+            mra.region,
+            mra.detail_address,
+            mll.create_time,
+            mll.ip,
+            mll.city,
+            mll.login_type,
+            mll.province,
+            msi.consume_amount,
+            msi.order_count,
+            msi.comment_count,
+            msi.coupon_count,
+            msi.return_order_count,
+            msi.login_count,
+            msi.recent_order_time
+        FROM
+            xbz_member m
+            LEFT JOIN xbz_member_level ml ON m.member_level_id=ml.id
+            LEFT JOIN xbz_member_receive_address mra ON m.id=mra.member_id
+            LEFT JOIN xbz_member_login_log mll ON m.id=mll.member_id
+            LEFT JOIN xbz_member_statistics_info msi ON m.id=msi.member_id
+        WHERE
+            m.id = #{id}
+    </select>
+</mapper>
